@@ -1,4 +1,3 @@
-// const { v1: uuidv1 } = require('uuid')
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 
@@ -19,7 +18,7 @@ const userSchema = new mongoose.Schema({
         min:6,
         max: 64
     },
-    strip_account_id: '',
+    stripe_account_id: '',
     stripe_seller: {},
     stripeSession: {},
 
@@ -42,5 +41,17 @@ userSchema.pre('save', function(next){
         return next()
     }
 })
+
+userSchema.methods.comparePassword= function(password, next){
+    bcrypt.compare(password, this.password, function(err, match){
+        if(err){
+            console.log("Compare password error", err)
+            return next(err, false)
+        }
+
+        console.log('Match password', match)
+        return next(null,match)
+    })
+}
 
 export default mongoose.model('User', userSchema)
