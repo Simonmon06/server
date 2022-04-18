@@ -174,11 +174,12 @@ export const stripeSuccess = async(req, res) =>{
                 await User.findByIdAndUpdate(user._id, {
                     $set:{stripeSession:{}}
                 })
-                res.json({success:true})
-                // 7 update the item info unpaid to paid
-                await Item.findByIdAndUpdate(item._id, {
+                await Item.findByIdAndUpdate(itemId, {
                     $set:{paid:true}
                 })
+                res.json({success:true})
+                // 7 update the item info unpaid to paid
+
             }
         }
     } catch (error) {
