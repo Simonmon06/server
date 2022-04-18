@@ -1,6 +1,6 @@
 import express from 'express'
 import formidable from 'express-formidable'
-import {create, items, image, sellerItems,removeItem, readItem, updateItem, userOrders} from '../controllers/item'
+import {create, items, image, sellerItems,removeItem, readItem, updateItem, userOrders, searchItems} from '../controllers/item'
 import {requireSignin, itemOwner} from '../middlewares'
 
 const router = express.Router()
@@ -12,4 +12,5 @@ router.delete('/delete-item/:itemId',requireSignin,itemOwner, removeItem)
 router.get('/item/:itemId', readItem)
 router.put('/update-item/:itemId', requireSignin, itemOwner, formidable(), updateItem)
 router.get('/user-orders', requireSignin, userOrders)
+router.post('/search-items', searchItems)
 module.exports = router

@@ -103,4 +103,8 @@ export const userOrders = async (req, res) =>{
     res.json(allOrdersForOneUser)
 }
 
-
+export const searchItems = async (req, res) =>{
+    const {title, condition}  = req.body
+    let result = await Item.find({title,condition}).select('-image.data').exec()
+    res.json(result)
+}
