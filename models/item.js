@@ -11,6 +11,9 @@ const itemSchema = new Schema ({
         required: 'Content is required',
         maxLength: 10000
     },
+    size: {
+        type: String,
+    },
     location:{
         type:String,
     },
@@ -30,12 +33,13 @@ const itemSchema = new Schema ({
         data: Buffer,
         contentType: String
     },
-    from:{
+    purchaseDate:{
         type: Date,
     },
-    to:{
-        type: Date,
-    },
+    paid: {
+        type: Boolean,
+        default: false,
+    }
 }, {timestamps: true})
 
 export default mongoose.model('Item', itemSchema)

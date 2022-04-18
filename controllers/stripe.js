@@ -1,7 +1,8 @@
 import User from '../models/user'
+import Item from '../models/item'
+import Order from '../models/order'
 const stripe = require('stripe')(process.env.STRIPE_SECRET)
 import queryString from 'query-string'
-
 export const createConnectAccount = async (req ,res) =>{
     // 1. find user from db
     const user = await User.findById(req.user._id).exec()
@@ -103,12 +104,93 @@ export const payoutSetting = async(req, res) =>{
     }
 
 }
+
+
+export const stripeSessionId = async(req, res) =>{
+    // 1. get item id from req.body
+    const {itemId} = req.body
+    // 2. find the item based on item id from db
+    const item = await Item.findById(itemId).populate('postedBy').exec()
+    // 3. 10% charge as application fee
+    const fee = (item.price *10)/100
+    // 4. create a session
+    console.log('you hit stripe session id', req.body.itemId)
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        // 5. item detail
+        line_items: [{
+            name: item.title,
+            amount: item.price * 100, // in cents
+            currency: 'cad',
+            quantity: 1
+        }],
+        // 6. create the payment_intent_data with application_fee_amount and destination charge 10%
+        payment_intent_data: {
+        application_fee_amount: fee * 100,
+        transfer_data: {
+            destination: item.postedBy.stripe_account_id,
+            },
+        },
+        //redirect url 
+        success_url: `${process.env.STRIPE_SUCCESS_URL}/${item._id}`,
+        cancel_url: process.env.STRIPE_CANCEL_URL
+
+    })
+    // console.log('SESSION ===>', session)
+    // 7. add the session (order) to user who do the purchase in the db 
+    let updatedUser  = await User.findByIdAndUpdate(req.user._id, {stripeSession: session},{new: true}).exec()
+    // console.log('updatedUser: ======> ', updatedUser)
+    //
+    // 8. send the response which contains session id to front end
+    res.send({
+        sessionId: session.id
+    })
+}
+
+export const stripeSuccess = async(req, res) =>{
+    try {
+        // 1. get itemId from req.body
+        const {itemId} = req.body
+        // 2. find current user
+        const user = await User.findById(req.user._id).exec()
+        // retrieve stipe session, based on the session id which has been saved in the user db
+        if(!user.stripeSession){
+            return;
+        }
+        const session = await stripe.checkout.sessions.retrieve(user.stripeSession.id)
+        // 4 if session payment status is paid, create order
+        if(session.payment_status === 'paid'){
+            const orderExists = await Order.findOne({'session.id': session.id}).exec()
+            if (orderExists){
+                //6 if orderExists send success:true, sometimes users try to go back to last page after success...
+                res.json({success:true})
+            } else{
+                let order = await new Order({
+                    item: itemId,
+                    orderedBy: user._id,
+                    session,
+                }).save()
+                // remove user's stripeSession
+                await User.findByIdAndUpdate(user._id, {
+                    $set:{stripeSession:{}}
+                })
+                res.json({success:true})
+                // 7 update the item info unpaid to paid
+                await Item.findByIdAndUpdate(item._id, {
+                    $set:{paid:true}
+                })
+            }
+        }
+    } catch (error) {
+        console.log('stripeSuccess error: ', error)
+    }
+}
 // const updateDelayDays = async (accountId) =>{
 //     const account = await stripe.accounts.update(accountId, {
 //         settings:{
 //             payouts:{
 //                 schedule:{
-//                     delay_days: 7
+//                     delay_days: 1
 //                 }
 //             }
 //         }

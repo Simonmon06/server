@@ -1,4 +1,5 @@
 import Item from '../models/item'
+import Order from '../models/order'
 import fs from 'fs'
 
 export const create = async (req,res) =>{
@@ -30,7 +31,7 @@ export const create = async (req,res) =>{
 // show all item for all users
 export const items = async (req, res) =>{
     //only show 24 item, and without their imgs
-    let all = await Item.find({}).limit(24).select('-image.data').populate('postedBy', '_id name').exec()
+    let all = await Item.find({paid: false}).limit(24).select('-image.data').populate('postedBy', '_id name').exec()
     res.json(all)
 }
 // show img for the items
@@ -56,7 +57,11 @@ export const removeItem = async (req, res) =>{
 }
 
 export const readItem = async (req, res) =>{
-    let item = await Item.findById(req.params.itemId).select('-image.data').exec()
+    let item = await Item.findById(req.params.itemId)
+    .populate('postedBy', '_id name')
+    .select('-image.data')
+    .exec()
+    
     console.log('One Item send to front end:', item )
     res.json(item)
 
@@ -76,6 +81,7 @@ export const updateItem = async (req, res) =>{
 
             data.image = image
         }
+        console.log('updated req', req.fields)
         let updated = await Item.findByIdAndUpdate(req.params.itemId, data, {
             new: true
         }).select('-image.data')
@@ -86,3 +92,15 @@ export const updateItem = async (req, res) =>{
     }
 
 }
+
+export const userOrders = async (req, res) =>{
+    const allOrdersForOneUser = await Order.find({orderedBy: req.user._id})
+    .select('session')
+    .populate('item', '-image.data')
+    .populate('orderedBy','_id name')
+    .exec()
+
+    res.json(allOrdersForOneUser)
+}
+
+

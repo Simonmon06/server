@@ -36,7 +36,7 @@ export const login= async(req,res) =>{
         console.log('User exist', user)
 
         if(!user){
-            res.status(400).send('User with that email not found')
+            return res.status(400).send('User with that email not found')
         }
         //compare password
         user.comparePassword(password, (err, match)=>{
