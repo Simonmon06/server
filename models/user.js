@@ -23,24 +23,10 @@ const userSchema = new mongoose.Schema({
     stripeSession: {},
 
 },
-    {timestamps: true}
+    {timestamps: true} // everytime a  user is created/updated the createtiime and updatetime will be add as well.
 )
 
-userSchema.pre('save', function(next){
-    let user = this
-    if(user.isModified('password')){
-        return bcrypt.hash(user.password, 12, function(err, hash){
-            if(err){
-                console.log('BCRYPT HASH ERROR', err)
-                return next(err)
-            }
-            user.password = hash
-            return next()
-        })
-    }else{
-        return next()
-    }
-})
+
 
 userSchema.methods.comparePassword= function(password, next){
     bcrypt.compare(password, this.password, function(err, match){
@@ -53,5 +39,21 @@ userSchema.methods.comparePassword= function(password, next){
         return next(null,match)
     })
 }
+
+userSchema.pre('save', function(next){
+    let user = this
+    if(user.isModified('password')){
+        return bcrypt.hash(user.password, 12, function(err, hash){
+            if(err){
+                // console.log('error in bcrypt hash password', err)
+                return next(err)
+            }
+            user.password = hash
+            return next()
+        })
+    }else{
+        return next()
+    }
+})
 
 export default mongoose.model('User', userSchema)
