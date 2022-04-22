@@ -3,7 +3,7 @@ import Item from '../models/item'
 import Order from '../models/order'
 const stripe = require('stripe')(process.env.STRIPE_SECRET)
 import queryString from 'query-string'
-export const createConnectAccount = async (req ,res) =>{
+export const createStripeIdAndLink = async (req ,res) =>{
     // 1. find user from db
     const user = await User.findById(req.user._id).exec()
     console.log('User ==>', user)
