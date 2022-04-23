@@ -1,8 +1,12 @@
-import express from 'express'
-// filesystem
-import {readdirSync} from 'fs'
-import cors from 'cors'
-import mongoose from 'mongoose'
+// import express from 'express'
+// // filesystem
+// import {readdirSync} from 'fs'
+// import cors from 'cors'
+// import mongoose from 'mongoose'
+const express =require('express')
+const fs =require('fs')
+const cors =require('cors')
+const mongoose =require('mongoose')
 const morgan = require('morgan')
 require('dotenv').config()
 
@@ -27,5 +31,5 @@ app.use(express.json())
 
 // route middleware
 // prefixed url, add /api everytime
-readdirSync('./routes').map((r) => app.use('/api', require(`./routes/${r}`)))
+fs.readdirSync('./routes').map((r) => app.use('/api', require(`./routes/${r}`)))
 app.listen(port, ()=> console.log(`server is running on port ${port}`))

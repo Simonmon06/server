@@ -1,8 +1,8 @@
-import Item from '../models/item'
-import Order from '../models/order'
-import fs from 'fs'
 
-export const create = async (req,res) =>{
+const Item = require('../models/item')
+const Order = require('../models/order')
+const fs = require('fs')
+const create = async (req,res) =>{
     console.log('req.fields: ',req.fields)
     console.log('req.files: ',req.files)
 
@@ -29,13 +29,13 @@ export const create = async (req,res) =>{
     }
 }
 // show all item for all users
-export const items = async (req, res) =>{
+const items = async (req, res) =>{
     //only show 24 item, and without their imgs
     let all = await Item.find({paid: false}).limit(24).select('-image.data').populate('postedBy', '_id name').exec()
     res.json(all)
 }
 // show img for the items
-export const image = async (req, res) =>{
+const image = async (req, res) =>{
     let item = await Item.findById(req.params.itemId).exec()
     if(item && item.image && item.image.data !== null){
         res.set('Content-type', item.image.contentType)
@@ -43,20 +43,20 @@ export const image = async (req, res) =>{
     }
 }
 // show item for current user
-export const sellerItems = async (req,res) =>{
+const sellerItems = async (req,res) =>{
     let all = await Item.find({postedBy: req.user._id}).select('-image.data').populate('postedBy', '_id name').exec()
     console.log('items by userid', all)
     res.send(all)
 }
 
-export const removeItem = async (req, res) =>{
+const removeItem = async (req, res) =>{
     let removed = await Item.findByIdAndDelete(req.params.itemId).select('-image.data').exec()
     res.json(removed)
     // res.json({ok:true})
 
 }
 
-export const readItem = async (req, res) =>{
+const readItem = async (req, res) =>{
     let item = await Item.findById(req.params.itemId)
     .populate('postedBy', '_id name')
     .select('-image.data')
@@ -67,7 +67,7 @@ export const readItem = async (req, res) =>{
 
 }
 
-export const updateItem = async (req, res) =>{
+const updateItem = async (req, res) =>{
     try {
         let fields = req.fields;
         let files = req.files;
@@ -93,7 +93,7 @@ export const updateItem = async (req, res) =>{
 
 }
 
-export const userOrders = async (req, res) =>{
+const userOrders = async (req, res) =>{
     const allOrdersForOneUser = await Order.find({orderedBy: req.user._id})
     .select('session')
     .populate('item', '-image.data')
@@ -103,8 +103,20 @@ export const userOrders = async (req, res) =>{
     res.json(allOrdersForOneUser)
 }
 
-export const searchItems = async (req, res) =>{
+const searchItems = async (req, res) =>{
     const {title, condition}  = req.body
     let result = await Item.find({title,condition}).select('-image.data').exec()
     res.json(result)
+}
+
+module.exports = {
+    create,
+    items,
+    image,
+    sellerItems,
+    removeItem,
+    readItem,
+    updateItem,
+    userOrders,
+    searchItems
 }

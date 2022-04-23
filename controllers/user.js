@@ -1,7 +1,6 @@
 
-import User from "../models/user"
-
-export const searchUsers = async (req, res) =>{
+const User = require('../models/user')
+const searchUsers = async (req, res) =>{
     const {name}  = req.body
     
     let fuzzySearch = {name: ''}
@@ -13,4 +12,9 @@ export const searchUsers = async (req, res) =>{
         {name: new RegExp(name,"i")}
     ).exec()
     res.json(result)
+}
+
+
+module.exports = {
+    searchUsers
 }

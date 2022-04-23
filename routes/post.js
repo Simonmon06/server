@@ -1,8 +1,7 @@
-import express from 'express'
-import formidable from 'express-formidable'
-import {createPost, getAllPosts, getPostImage, getPostsByUser, deletePost, updateLike, updateUnlike,getOnePost, updateComment,updateUnComment } from '../controllers/post.js'
-import {postOwner, requireSignin} from '../middlewares'
-
+const express = require('express')
+const formidable = require('express-formidable')
+const {createPost, getAllPosts, getPostImage, getPostsByUser, deletePost, updateLike, updateUnlike,getOnePost, updateComment,updateUnComment } = require('../controllers/post.js')
+const {requireSignin, postOwner} = require('../middlewares')
 const router = express.Router()
 router.post('/create-post',requireSignin, formidable(), createPost)
 router.get('/posts', getAllPosts)

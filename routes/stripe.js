@@ -1,7 +1,7 @@
-import express from 'express'
+const express = require('express')
 const router = express.Router()
-import {createStripeIdAndLink, getAccountStatus, getAccountBalance, payoutSetting, stripeSessionId, stripeSuccess} from '../controllers/stripe'
-import {requireSignin} from '../middlewares'
+const {createStripeIdAndLink, getAccountStatus, getAccountBalance, payoutSetting, stripeSessionId, stripeSuccess} = require('../controllers/stripe')
+const {requireSignin} = require('../middlewares')
 
 router.post('/create-stripe-account', requireSignin, createStripeIdAndLink)
 router.post('/get-account-status', requireSignin, getAccountStatus)

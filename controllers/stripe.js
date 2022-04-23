@@ -1,9 +1,10 @@
-import User from '../models/user'
-import Item from '../models/item'
-import Order from '../models/order'
+
+const User = require('../models/user')
+const Item = require('../models/item')
+const Order = require('../models/order')
 const stripe = require('stripe')(process.env.STRIPE_SECRET)
-import queryString from 'query-string'
-export const createStripeIdAndLink = async (req ,res) =>{
+const queryString = require('query-string')
+const createStripeIdAndLink = async (req ,res) =>{
     // 1. find user from db
     const user = await User.findById(req.user._id).exec()
     console.log('User ==>', user)
@@ -41,7 +42,7 @@ export const createStripeIdAndLink = async (req ,res) =>{
 
 }
 
-export const getAccountStatus = async(req, res) =>{
+const getAccountStatus = async(req, res) =>{
     console.log('Get Account status')
     // 1. find user from db
     const user = await User.findById(req.user._id).exec()
@@ -66,7 +67,7 @@ export const getAccountStatus = async(req, res) =>{
 }
 
 
-export const getAccountBalance = async(req, res) =>{
+const getAccountBalance = async(req, res) =>{
     const user = await User.findById(req.user._id).exec()
 
     try {
@@ -83,7 +84,7 @@ export const getAccountBalance = async(req, res) =>{
 
 
 // get one time login link for he can access his user setting
-export const payoutSetting = async(req, res) =>{
+const payoutSetting = async(req, res) =>{
     const user = await User.findById(req.user._id).exec()
 
     try {
@@ -106,7 +107,7 @@ export const payoutSetting = async(req, res) =>{
 }
 
 
-export const stripeSessionId = async(req, res) =>{
+const stripeSessionId = async(req, res) =>{
     // 1. get item id from req.body
     const {itemId} = req.body
     // 2. find the item based on item id from db
@@ -147,7 +148,7 @@ export const stripeSessionId = async(req, res) =>{
     })
 }
 
-export const stripeSuccess = async(req, res) =>{
+const stripeSuccess = async(req, res) =>{
     try {
         // 1. get itemId from req.body
         const {itemId} = req.body
@@ -186,15 +187,12 @@ export const stripeSuccess = async(req, res) =>{
         console.log('stripeSuccess error: ', error)
     }
 }
-// const updateDelayDays = async (accountId) =>{
-//     const account = await stripe.accounts.update(accountId, {
-//         settings:{
-//             payouts:{
-//                 schedule:{
-//                     delay_days: 1
-//                 }
-//             }
-//         }
-//     })
-//     return account
-// }
+
+module.exports = {
+    createStripeIdAndLink,
+    getAccountStatus,
+    getAccountBalance,
+    payoutSetting,
+    stripeSessionId,
+    stripeSuccess
+}

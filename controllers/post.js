@@ -1,7 +1,8 @@
-import Post from '../models/post'
-import fs from 'fs'
 
-export const createPost = async (req,res) =>{
+const Post = require('../models/post')
+const fs = require('fs')
+
+const createPost = async (req,res) =>{
     console.log('req.fields: ',req.fields)
     console.log('req.files: ',req.files)
 
@@ -28,7 +29,7 @@ export const createPost = async (req,res) =>{
     }
 }
 
-export const getAllPosts = async (req, res) =>{
+const getAllPosts = async (req, res) =>{
     //only show 24 item, and without their imgs
     let all = await Post.find().limit(24).select('-image.data')
                         .populate('postedBy', '_id name')
@@ -38,7 +39,7 @@ export const getAllPosts = async (req, res) =>{
     res.json(all)
 }
 
-export const getPostImage = async (req, res) =>{
+const getPostImage = async (req, res) =>{
     let post = await Post.findById(req.params.postId).exec()
     if(post && post.image && post.image.data !== null){
         res.set('Content-type', post.image.contentType)
@@ -46,7 +47,7 @@ export const getPostImage = async (req, res) =>{
     }
 }
 
-export const getPostsByUser = async (req,res) =>{
+const getPostsByUser = async (req,res) =>{
     let postsByUser = await Post.find({postedBy: req.user._id})
                                 .select('-image.data')
                                 .populate('postedBy', '_id name')
@@ -57,13 +58,13 @@ export const getPostsByUser = async (req,res) =>{
     res.send(postsByUser)
 }
 
-export const deletePost = async (req, res) =>{
+const deletePost = async (req, res) =>{
     let removed = await Post.findByIdAndDelete(req.params.postId).select('-image.data').exec()
     res.json(removed)
 
 }
 
-export const updateLike = async (req, res) =>{
+const updateLike = async (req, res) =>{
     try{
         let updatedPost = await Post.findByIdAndUpdate(
             req.params.postId,
@@ -79,7 +80,7 @@ export const updateLike = async (req, res) =>{
 
 }
 
-export const updateUnlike = async (req, res) =>{
+const updateUnlike = async (req, res) =>{
     try{
         let updatedPost = await Post.findByIdAndUpdate(
             req.params.postId,
@@ -94,7 +95,7 @@ export const updateUnlike = async (req, res) =>{
     }
 }
 
-export const updateComment = async (req, res) =>{
+const updateComment = async (req, res) =>{
     let comment  = {...req.body}
     comment.postedBy = req.user._id
     
@@ -114,7 +115,7 @@ export const updateComment = async (req, res) =>{
     }
 }
 
-export const updateUnComment = async (req, res) =>{
+const updateUnComment = async (req, res) =>{
     let comment  = {...req.body}
     try{
         let updatedPost = await Post.findByIdAndUpdate(
@@ -133,32 +134,7 @@ export const updateUnComment = async (req, res) =>{
 }
 
 
-// export const updateItem = async (req, res) =>{
-//     try {
-//         let fields = req.fields;
-//         let files = req.files;
-//         let data  = {...fields}
-
-//         if(files.image){
-//             let image = {}
-//             image.data = fs.readFileSync(files.image.path)
-
-//             image.contentType = files.image.type
-
-//             data.image = image
-//         }
-//         console.log('updated req', req.fields)
-//         let updated = await Item.findByIdAndUpdate(req.params.itemId, data, {
-//             new: true
-//         }).select('-image.data')
-//         res.json(updated)
-//     } catch (err) {
-//         console.log(err)
-//         res.status(400).send('Item updated failed.')
-//     }
-
-// }
-export const getOnePost = async (req, res) =>{
+const getOnePost = async (req, res) =>{
     let post = await Post.findById(req.params.postId)
     .populate('postedBy', '_id name')
     .populate('comments', 'text createdAt')
@@ -169,4 +145,17 @@ export const getOnePost = async (req, res) =>{
     console.log('One Post send to front end:', post )
     res.json(post)
 
+}
+
+module.exports = {
+    createPost,
+    getAllPosts,
+    getPostImage,
+    getPostsByUser,
+    deletePost,
+    updateLike,
+    updateUnlike,
+    updateComment,
+    updateUnComment,
+    getOnePost
 }

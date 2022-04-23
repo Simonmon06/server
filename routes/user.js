@@ -1,6 +1,6 @@
-import express from 'express'
-import {searchUsers} from '../controllers/user.js'
-import {requireSignin} from '../middlewares'
+const express = require('express')
+const {searchUsers} = require('../controllers/user')
+const {requireSignin} = require('../middlewares')
 
 const router = express.Router()
 router.post('/search-users',requireSignin, searchUsers)
