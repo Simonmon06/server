@@ -117,7 +117,6 @@ const stripeSessionId = async(req, res) =>{
     // 4. create a session
     console.log('you hit stripe session id', req.body.itemId)
     const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
         // 5. item detail
         line_items: [{
             name: item.title,
@@ -125,6 +124,7 @@ const stripeSessionId = async(req, res) =>{
             currency: 'cad',
             quantity: 1
         }],
+        
         // 6. create the payment_intent_data with application_fee_amount and destination charge 10%
         payment_intent_data: {
         application_fee_amount: fee * 100,
@@ -132,9 +132,10 @@ const stripeSessionId = async(req, res) =>{
             destination: item.postedBy.stripe_account_id,
             },
         },
+        payment_method_types: ['card'],
         //redirect url 
-        success_url: `${process.env.STRIPE_SUCCESS_URL}/${item._id}`,
-        cancel_url: process.env.STRIPE_CANCEL_URL
+        success_url: `${process.env.PAYMENT_SUCCESS}/${item._id}`,
+        cancel_url: process.env.PAYMENT_CANCEL
 
     })
     // console.log('SESSION ===>', session)

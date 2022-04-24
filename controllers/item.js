@@ -31,7 +31,7 @@ const create = async (req,res) =>{
 // show all item for all users
 const items = async (req, res) =>{
     //only show 24 item, and without their imgs
-    let all = await Item.find({paid: false}).limit(24).select('-image.data').populate('postedBy', '_id name').exec()
+    let all = await Item.find({paid: false}).select('-image.data').populate('postedBy', '_id name').exec()
     res.json(all)
 }
 // show img for the items

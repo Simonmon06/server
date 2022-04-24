@@ -12,20 +12,29 @@ const postSchema = new mongoose.Schema({
     },
     image:{
         data: Buffer,
-        contentType: String
+        contentType: String,
     },
     postedBy: {
         type:ObjectId,
-        ref: "User"
+        ref: "User",
     },
     thumbs:[
-        {type: ObjectId, ref: "User"}
+        {
+            type: ObjectId, 
+            ref: "User",
+        }
     ],
     comments:[
         {
             text: String,
-            createdAt:{type: Date, default: Date.now},
-            postedBy: {type: ObjectId, ref: "User"}
+            createdAt:{
+                type: Date, 
+                default: Date.now,
+            },
+            postedBy: {
+                type: ObjectId, 
+                ref: "User"
+            }
         }
     ]
     
