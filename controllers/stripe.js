@@ -112,12 +112,10 @@ const stripeSessionId = async(req, res) =>{
     const {itemId} = req.body
     // 2. find the item based on item id from db
     const item = await Item.findById(itemId).populate('postedBy').exec()
-    // 3. 10% charge as application fee
-    const fee = (item.price *10)/100
-    // 4. create a session
+    // 3. create a session
     console.log('you hit stripe session id', req.body.itemId)
     const session = await stripe.checkout.sessions.create({
-        // 5. item detail
+        // 4. item detail
         line_items: [{
             name: item.title,
             amount: item.price * 100, // in cents
@@ -125,9 +123,8 @@ const stripeSessionId = async(req, res) =>{
             quantity: 1
         }],
         
-        // 6. create the payment_intent_data with application_fee_amount and destination charge 10%
+        // 5. seller's id
         payment_intent_data: {
-        application_fee_amount: fee * 100,
         transfer_data: {
             destination: item.postedBy.stripe_account_id,
             },
@@ -139,11 +136,11 @@ const stripeSessionId = async(req, res) =>{
 
     })
     // console.log('SESSION ===>', session)
-    // 7. add the session (order) to user who do the purchase in the db 
+    // 6. add the session (order) to user who do the purchase in the db 
     let updatedUser  = await User.findByIdAndUpdate(req.user._id, {stripeSession: session},{new: true}).exec()
     // console.log('updatedUser: ======> ', updatedUser)
     //
-    // 8. send the response which contains session id to front end
+    // 7. send the response which contains session id to front end
     res.send({
         sessionId: session.id
     })

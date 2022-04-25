@@ -2,6 +2,7 @@
 const Item = require('../models/item')
 const Order = require('../models/order')
 const fs = require('fs')
+
 const create = async (req,res) =>{
     console.log('req.fields: ',req.fields)
     console.log('req.files: ',req.files)
@@ -42,18 +43,13 @@ const image = async (req, res) =>{
         return res.send(item.image.data)
     }
 }
+
+
 // show item for current user
 const sellerItems = async (req,res) =>{
     let all = await Item.find({postedBy: req.user._id}).select('-image.data').populate('postedBy', '_id name').exec()
     console.log('items by userid', all)
     res.send(all)
-}
-
-const removeItem = async (req, res) =>{
-    let removed = await Item.findByIdAndDelete(req.params.itemId).select('-image.data').exec()
-    res.json(removed)
-    // res.json({ok:true})
-
 }
 
 const readItem = async (req, res) =>{
@@ -92,6 +88,14 @@ const updateItem = async (req, res) =>{
     }
 
 }
+
+const removeItem = async (req, res) =>{
+    let removed = await Item.findByIdAndDelete(req.params.itemId).select('-image.data').exec()
+    res.json(removed)
+
+}
+
+
 
 const userOrders = async (req, res) =>{
     const allOrdersForOneUser = await Order.find({orderedBy: req.user._id})

@@ -22,7 +22,7 @@ const register = async (req, res) => {
         
         await user.save()
         console.log('User created', user)
-        return res.json({ok: true})
+        return res.json({success: true})
     }catch(err) {
         console.log('Create user failed', err)
         return res.status(400).send('Error. Try again')
