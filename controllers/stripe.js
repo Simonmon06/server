@@ -83,29 +83,6 @@ const getAccountBalance = async(req, res) =>{
 }
 
 
-// get one time login link for he can access his user setting
-const payoutSetting = async(req, res) =>{
-    const user = await User.findById(req.user._id).exec()
-
-    try {
-        const loginLink = await stripe.accounts.createLoginLink(
-            user.stripe_account_id,
-            {
-                redirect_url: process.env.STRIPE_SETTING_REDIRECT_URL
-            }
-        )
-
-
-        console.log('url is :', process.env.STRIPE_SETTING_REDIRECT_URL)
-
-        // console.log('Login Link for payout setting', loginLink)
-        res.json(loginLink)
-    } catch (err) {
-        console.log('stripe payout setting error', err)
-    }
-
-}
-
 
 const stripeSessionId = async(req, res) =>{
     // 1. get item id from req.body
@@ -190,7 +167,6 @@ module.exports = {
     createStripeIdAndLink,
     getAccountStatus,
     getAccountBalance,
-    payoutSetting,
     stripeSessionId,
     stripeSuccess
 }
